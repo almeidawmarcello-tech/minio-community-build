@@ -15,16 +15,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout build repository
+        uses: actions/checkout@v4
+        with:
+          path: build-config
+
       - name: Checkout MinIO source
         uses: actions/checkout@v4
         with:
           repository: minio/minio
           path: minio-source
-
-      - name: Checkout build repository
-        uses: actions/checkout@v4
-        with:
-          path: build-config
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -40,7 +40,6 @@ jobs:
       - name: Prepare Docker build context
         run: |
           cp minio-source/minio build-config/minio
-          cp minio-source/dockerscripts/docker-entrypoint.sh build-config/docker-entrypoint.sh
 
       - name: Login to GHCR
         uses: docker/login-action@v3
