@@ -1,17 +1,17 @@
-FROM alpine:3.22
+FROM debian:bookworm-slim
 
-RUN apk add --no-cache ca-certificates
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY minio /usr/local/bin/minio
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN chmod +x /usr/local/bin/minio \
-    /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/minio
 
 VOLUME ["/data"]
 
 EXPOSE 9000 9001
 
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/minio"]
 
-CMD ["minio"]
+CMD ["server", "/data", "--console-address", ":9001"]
