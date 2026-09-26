@@ -1,68 +1,68 @@
-```yaml
 name: Build MinIO Community Edition
 
-"on":
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+on:
+workflow_dispatch:
+push:
+branches:
+- main
 
 permissions:
-  contents: read
-  packages: write
+contents: read
+packages: write
 
 jobs:
-  build-minio:
-    runs-on: ubuntu-latest
+build-minio:
+runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout build repository
-        uses: actions/checkout@v4
-        with:
-          path: build-config
+```
+steps:
+  - name: Checkout build repository
+    uses: actions/checkout@v4
+    with:
+      path: build-config
 
-      - name: Checkout MinIO source
-        uses: actions/checkout@v4
-        with:
-          repository: minio/minio
-          path: minio-source
+  - name: Checkout MinIO source
+    uses: actions/checkout@v4
+    with:
+      repository: minio/minio
+      path: minio-source
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.24.x"
+  - name: Setup Go
+    uses: actions/setup-go@v5
+    with:
+      go-version: "1.24.x"
 
-      - name: Build MinIO
-        working-directory: minio-source
-        run: |
-          go version
-          go build -o minio
+  - name: Build MinIO
+    working-directory: minio-source
+    run: |
+      go version
+      go build -o minio
 
-      - name: Prepare Docker build context
-        run: |
-          cp minio-source/minio build-config/minio
+  - name: Prepare Docker build context
+    run: |
+      cp minio-source/minio build-config/minio
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  - name: Login to GHCR
+    uses: docker/login-action@v3
+    with:
+      registry: ghcr.io
+      username: ${{ github.actor }}
+      password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository_owner }}/minio-community
-          tags: |
-            type=raw,value=latest
-            type=sha
+  - name: Extract metadata
+    id: meta
+    uses: docker/metadata-action@v5
+    with:
+      images: ghcr.io/${{ github.repository_owner }}/minio-community
+      tags: |
+        type=raw,value=latest
+        type=sha
 
-      - name: Build and push MinIO image
-        uses: docker/build-push-action@v6
-        with:
-          context: build-config
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  - name: Build and push MinIO image
+    uses: docker/build-push-action@v6
+    with:
+      context: build-config
+      push: true
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
 ```
