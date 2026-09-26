@@ -1,7 +1,7 @@
 ```yaml
 name: Build MinIO Community Edition
 
-on:
+"on":
   workflow_dispatch:
   push:
     branches:
@@ -30,7 +30,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.x'
+          go-version: "1.24.x"
 
       - name: Build MinIO
         working-directory: minio-source
